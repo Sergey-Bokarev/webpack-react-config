@@ -1,48 +1,25 @@
 import path from "path";
 import webpack from "webpack";
-import HtmlWebpackPlugin from "html-webpack-plugin";
-import { Configuration as DevServerConfiguration } from "webpack-dev-server";
-
-type Mode = 'production' | 'development';
+import { buildWebpack } from "./config/build/buildWebpack";
+import { BuildMode, BuildPaths } from "./config/build/types/types";
 
 interface EnvVariables {
-    mode: Mode,
+    mode: BuildMode,
     port: number
 }
 
 export default (env: EnvVariables) => {
-
-    const isDev = env.mode === 'development';
-
-    const config: webpack.Configuration = {
-        mode: env.mode ?? 'development',
+    const paths: BuildPaths = {
+        output: path.resolve(__dirname, 'build'),
         entry: path.resolve(__dirname, 'src', 'index.tsx'),
-        output: {
-            path: path.resolve(__dirname, 'build'),
-            filename: '[name].[contenthash].js',
-            clean: true
-        },
-        module: {
-            rules: [
-                {
-                    test: /\.tsx?$/,
-                    use: 'ts-loader',
-                    exclude: /node_modules/,
-                },
-            ],
-        },
-        resolve: {
-            extensions: ['.tsx', '.ts', '.js']
-        },
-        plugins: [
-            new HtmlWebpackPlugin({ template: path.resolve(__dirname, 'public', 'index.html') })
-        ],
-        devtool: isDev ? "inline-source-map" : false,
-        devServer: isDev ? {
-            port: env.port ?? 5000,
-            open: true
-        } : undefined
+        html: path.resolve(__dirname, 'public', 'index.html')
     }
+
+    const config: webpack.Configuration = buildWebpack({
+        port: env.port ?? 3000,
+        mode: env.mode ?? 'development',
+        paths
+    });
 
     return config;
 }
