@@ -1,6 +1,7 @@
 import { Configuration } from "webpack";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
+import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import { BuildOptions } from "./types/types";
 import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 
@@ -8,11 +9,10 @@ export function buildPlugins({mode, paths, analizer}: BuildOptions): Configurati
     const isDev = mode === 'development';
     const isProd = mode === 'production';
 
-    const plugins: Configuration['plugins'] = [];
-
-    plugins.push(
-        new HtmlWebpackPlugin({ template: paths.html })
-    );
+    const plugins: Configuration['plugins'] = [
+        new HtmlWebpackPlugin({ template: paths.html }),
+        new ForkTsCheckerWebpackPlugin()
+    ];
 
     if (isDev) {
     }
